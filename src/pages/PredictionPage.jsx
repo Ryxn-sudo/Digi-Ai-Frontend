@@ -71,7 +71,7 @@ const PredictionPage = () => {
 
   return (
     <motion.div 
-      className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-950 py-10 px-4 sm:px-6 lg:px-8"
+      className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 py-10 px-4 sm:px-6 lg:px-8"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
