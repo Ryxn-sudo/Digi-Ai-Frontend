@@ -40,8 +40,8 @@ const GameInstructions = ({ onClose }) => {
                 Game Objective
               </h3>
               <p className="text-sm sm:text-base">
-                Draw the shown number as clearly as possible. The AI will analyze your drawing and 
-                determine if it matches the target digit.
+                Draw the shown number as clearly as possible, matching its rotation angle. The AI will analyze 
+                your drawing and determine if it matches the target digit.
               </p>
             </div>
             
@@ -51,6 +51,14 @@ const GameInstructions = ({ onClose }) => {
                 Game Rules
               </h3>
               <ul className="space-y-2 sm:space-y-3 text-sm sm:text-base">
+                <li className="flex">
+                  <Check size={16} className="text-green-400 mr-2 shrink-0 mt-0.5" />
+                  <span>Each digit will be displayed with a random rotation angle</span>
+                </li>
+                <li className="flex">
+                  <Check size={16} className="text-green-400 mr-2 shrink-0 mt-0.5" />
+                  <span>Try to match both the digit and its rotation when drawing</span>
+                </li>
                 <li className="flex">
                   <Check size={16} className="text-green-400 mr-2 shrink-0 mt-0.5" />
                   <span>You have 30 seconds to draw each digit</span>
@@ -80,6 +88,8 @@ const GameInstructions = ({ onClose }) => {
                 Tips for Success
               </h3>
               <ul className="list-disc pl-5 space-y-1 text-sm sm:text-base text-gray-300">
+                <li>Pay close attention to the rotation angle displayed with the digit</li>
+                <li>Try to draw your digit with the same tilt/rotation as shown</li>
                 <li>Draw the digit clearly in the center of the canvas</li>
                 <li>Use thick, solid strokes for better recognition</li>
                 <li>Don't rush - accuracy is more important than speed</li>

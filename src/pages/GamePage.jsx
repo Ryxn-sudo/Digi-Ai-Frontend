@@ -12,19 +12,38 @@ const GamePage = () => {
   const [showInstructions, setShowInstructions] = useState(false);
   const [predictionHistory, setPredictionHistory] = useState([]);
   const [gameActive, setGameActive] = useState(false);
+  const [highScore, setHighScore] = useState(0);
   const gameRef = useRef(null);
   const navigate = useNavigate();
   
- 
   useEffect(() => {
-   
+    // Load high score from localStorage
+    const savedHighScore = localStorage.getItem('numberGame_highScore');
+    if (savedHighScore) {
+      setHighScore(parseInt(savedHighScore));
+    }
+    
     if (!localStorage.getItem('numberGame_gamesPlayed')) {
       localStorage.setItem('numberGame_gamesPlayed', '0');
     }
   }, []);
 
-  const handleCorrectGuess = () => {
-    setScore(prevScore => prevScore + 10);
+  const handleCorrectGuess = (multiplier = 1) => {
+    // Add points based on difficulty multiplier
+    const pointsToAdd = 10 * multiplier;
+    
+    setScore(prevScore => {
+      const newScore = prevScore + pointsToAdd;
+      
+      // Update high score if necessary
+      if (newScore > highScore) {
+        setHighScore(newScore);
+        localStorage.setItem('numberGame_highScore', newScore.toString());
+      }
+      
+      return newScore;
+    });
+    
     setStreak(prevStreak => prevStreak + 1);
   };
 
