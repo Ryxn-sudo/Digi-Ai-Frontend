@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000';
+const API_URL = 'https://ryxn-sudo-digi-ai-backend.hf.space';
 
 export const getPredictionFromCanvasAPI = async (canvasData, debug = false) => {
   try {

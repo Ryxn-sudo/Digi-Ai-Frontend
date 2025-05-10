@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, Image, Loader, CloudUpload, CheckCircle2 } from 'lucide-react';
+import {  Image, Loader, CloudUpload, CheckCircle2 } from 'lucide-react';
 
 const ImageUploader = ({ selectedImage, handleImageUpload, handlePrediction, loading }) => {
   const [isDragging, setIsDragging] = useState(false);

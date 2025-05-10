@@ -2,14 +2,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Save, RefreshCw, Check, Info } from 'lucide-react';
-import CanvasDraw from 'react-canvas-draw'; // Import CanvasDraw
+import CanvasDraw from 'react-canvas-draw'; 
 import { submitTrainingData, getContributionStatus } from '../services/api';
 
 const TrainingContributionPage = () => {
   const containerRef = useRef(null);
   const canvasRef = useRef(null); // Reference for CanvasDraw
   const [selectedDigit, setSelectedDigit] = useState(null);
-  const [contributions, setContributions] = useState(0);
   const [showThankYou, setShowThankYou] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [contributionStatus, setContributionStatus] = useState({
@@ -211,8 +210,7 @@ const TrainingContributionPage = () => {
             return;
           }
           
-          setContributions(prev => prev + 1);
-          // Update local contribution status
+         
           if (response.current_count !== undefined) {
             setContributionStatus(prev => ({
               ...prev,
@@ -246,6 +244,13 @@ const TrainingContributionPage = () => {
   const progress = Math.min(100, (currentSamples / targetSamples) * 100);
   const remainingSamples = Math.max(0, targetSamples - currentSamples);
 
+  // Calculate progress status for visual indicators
+  const progressStatus = 
+    progress >= 100 ? "complete" : 
+    progress >= 75 ? "almostThere" : 
+    progress >= 50 ? "halfway" : 
+    progress >= 25 ? "started" : "beginning";
+
   return (
     <motion.div 
       className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-950 p-6"
@@ -256,8 +261,8 @@ const TrainingContributionPage = () => {
         <div className="flex justify-between items-center mb-8">
           <Link to="/">
             <motion.button 
-              className="flex items-center text-white bg-gray-800 px-4 py-2 rounded-lg hover:bg-gray-700"
-              whileHover={{ scale: 1.05 }}
+              className="flex items-center text-white bg-gray-800/80 backdrop-blur-sm px-4 py-2 rounded-lg hover:bg-gray-700 transition-all border border-gray-700/50 shadow-lg"
+              whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(255, 255, 255, 0.1)" }}
               whileTap={{ scale: 0.95 }}
             >
               <ArrowLeft size={18} className="mr-2" />
@@ -266,85 +271,133 @@ const TrainingContributionPage = () => {
           </Link>
           
           <motion.h1 
-            className="text-3xl font-bold text-white"
+            className="text-3xl font-bold text-white text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400"
             initial={{ y: -20 }}
             animate={{ y: 0 }}
           >
             Contribute to Training
           </motion.h1>
-          
-          <div className="text-white bg-indigo-600 px-4 py-2 rounded-lg">
-            Contributions: {contributions}
-          </div>
         </div>
         
         <motion.div
-          className="bg-gray-800/80 backdrop-blur-sm rounded-2xl p-8 border border-gray-700 mb-8"
+          className="bg-gray-800/80 backdrop-blur-sm rounded-2xl p-8 border border-gray-700/50 shadow-xl mb-8"
           ref={containerRef}
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.4 }}
         >
-          <div className="flex items-center text-white mb-4">
-            <Info size={20} className="mr-2 text-blue-400" />
-            <p>Draw a digit and help improve our model's accuracy by contributing labeled examples.</p>
+          <div className="flex items-start text-white mb-5 bg-blue-900/30 p-4 rounded-lg border border-blue-700/30">
+            <Info size={22} className="mr-3 text-blue-400 mt-0.5 flex-shrink-0" />
+            <p className="text-blue-100">Draw a digit and help improve our model's accuracy by contributing labeled examples. Each submission helps our AI learn and recognize handwriting better!</p>
           </div>
           
-          {/* Contribution Progress Bar */}
-          <div className="bg-gray-700/50 p-4 rounded-lg mb-6">
-            <div className="flex justify-between text-sm text-white mb-2">
-              <span>Model Retraining Progress</span>
-              <span>{currentSamples} / {targetSamples} samples</span>
-            </div>
-            <div className="w-full bg-gray-600 rounded-full h-4">
-              <div 
-                className="bg-blue-500 h-4 rounded-full transition-all duration-500 ease-out"
-                style={{ width: `${progress}%` }}
-              ></div>
-            </div>
-            {remainingSamples > 0 ? (
-              <p className="text-gray-300 text-sm mt-2">
-                {remainingSamples} more samples needed before the next model retraining
-              </p>
-            ) : (
-              <p className="text-green-300 text-sm mt-2">
-                Enough samples collected for retraining! The model will be updated soon.
-              </p>
-            )}
-          </div>
-          
-          {/* Canvas Section with CanvasDraw */}
+          {/* Enhanced Contribution Progress Bar */}
           <motion.div 
-            className="bg-white rounded-xl p-1 mx-auto shadow-2xl mb-6"
-            style={{ width: canvasSize.width + 8 }}
-            whileHover={{ boxShadow: "0 0 20px rgba(168, 85, 247, 0.4)" }}
+            className="bg-gray-800/80 p-5 rounded-xl mb-7 border border-gray-700/50 shadow-inner"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <div className="flex justify-between text-white mb-3 items-center">
+              <div className="flex items-center">
+                <motion.div 
+                  className={`w-3 h-3 rounded-full mr-2 ${
+                    progressStatus === "complete" ? "bg-green-500" : 
+                    progressStatus === "almostThere" ? "bg-blue-400" : 
+                    progressStatus === "halfway" ? "bg-purple-500" : 
+                    progressStatus === "started" ? "bg-amber-500" : "bg-gray-500"
+                  }`}
+                  animate={{ 
+                    scale: progressStatus === "complete" || progressStatus === "almostThere" ? [1, 1.2, 1] : 1
+                  }}
+                  transition={{ 
+                    repeat: progressStatus === "complete" || progressStatus === "almostThere" ? Infinity : 0,
+                    duration: 1.5
+                  }}
+                />
+                <span className="font-semibold">Model Retraining Progress</span>
+              </div>
+              <span className="bg-gray-700/70 px-3 py-1 rounded-full text-sm font-medium">
+                {currentSamples} / {targetSamples} samples
+              </span>
+            </div>
+            
+            <div className="w-full bg-gray-700/70 rounded-full h-5 p-0.5">
+              <motion.div 
+                className={`h-4 rounded-full ${
+                  progress >= 100 
+                    ? "bg-gradient-to-r from-emerald-500 to-green-400" 
+                    : progress >= 75 
+                      ? "bg-gradient-to-r from-blue-600 to-indigo-400"
+                      : "bg-gradient-to-r from-violet-600 to-blue-500"
+                }`}
+                style={{ width: `${progress}%` }}
+                initial={{ width: "0%" }}
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 1, type: "spring", stiffness: 50 }}
+              >
+                {progress >= 20 && (
+                  <div className="h-full flex items-center justify-center text-white text-xs font-bold">
+                    {Math.round(progress)}%
+                  </div>
+                )}
+              </motion.div>
+            </div>
+            
+            {remainingSamples > 0 ? (
+              <div className="flex items-center mt-3 text-gray-300 text-sm">
+                <RefreshCw size={14} className="mr-2 text-blue-400" />
+                <p>
+                  <span className="font-semibold text-blue-300">{remainingSamples} more samples</span> needed before the next model retraining
+                </p>
+              </div>
+            ) : (
+              <div className="flex items-center mt-3 text-green-300 text-sm">
+                <Check size={16} className="mr-2" />
+                <p className="font-medium">
+                  Enough samples collected for retraining! The model will be updated soon.
+                </p>
+              </div>
+            )}
+          </motion.div>
+          
+          {/* Enhanced Canvas Section with CanvasDraw */}
+          <motion.div 
+            className="bg-indigo-950/40 rounded-xl p-3 mx-auto shadow-2xl mb-6 border border-indigo-800/30"
+            style={{ width: canvasSize.width + 16 }}
+            whileHover={{ boxShadow: "0 0 25px rgba(168, 85, 247, 0.3)" }}
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, type: "spring" }}
           >
-            <CanvasDraw
-              ref={canvasRef}
-              brushColor="#000000"
-              brushRadius={brushSize}
-              canvasWidth={canvasSize.width}
-              canvasHeight={canvasSize.height}
-              backgroundColor="#FFFFFF"
-              hideGrid={true}
-              lazyRadius={0}
-              immediateLoading={true}
-              saveData={null} // Ensure we start with a clean canvas
-              loadTimeOffset={0}
-              style={{ display: 'block' }} // Ensure proper rendering
-            />
+            <div className="bg-white rounded-lg overflow-hidden shadow-inner">
+              <CanvasDraw
+                ref={canvasRef}
+                brushColor="#000000"
+                brushRadius={brushSize}
+                canvasWidth={canvasSize.width}
+                canvasHeight={canvasSize.height}
+                backgroundColor="#FFFFFF"
+                hideGrid={true}
+                lazyRadius={0}
+                immediateLoading={true}
+                saveData={null} // Ensure we start with a clean canvas
+                loadTimeOffset={0}
+                style={{ display: 'block' }} // Ensure proper rendering
+              />
+            </div>
           </motion.div>
           
-          {/* Debug display of processed image */}
+          {/* Debug display of processed image with enhanced styling */}
           {showDebug && processedImage && (
             <motion.div 
-              className="mt-4 flex flex-col items-center"
+              className="mb-5 flex flex-col items-center bg-gray-900/50 p-4 rounded-lg border border-gray-700/50"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <p className="text-sm text-gray-300 mb-2">Processed Image (32x32):</p>
-              <div className="bg-gray-900 p-2 rounded-lg border border-gray-700 inline-block">
+              <p className="text-sm text-blue-300 mb-2 font-medium">Processed Image (32x32):</p>
+              <div className="bg-black/50 p-2 rounded-lg border border-gray-700/50 inline-block shadow-lg">
                 <img 
                   src={processedImage} 
                   alt="Processed" 
@@ -355,90 +408,117 @@ const TrainingContributionPage = () => {
             </motion.div>
           )}
           
-          {/* Controls Section */}
+          {/* Enhanced Controls Section */}
           <div className="flex flex-col md:flex-row gap-6">
-            <div className="flex-1 bg-gray-700/50 p-4 rounded-lg">
-              <h3 className="text-white font-medium mb-3">Drawing Controls</h3>
+            <motion.div 
+              className="flex-1 bg-gray-800/70 p-5 rounded-xl border border-gray-700/50 shadow-lg"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <h3 className="text-white font-semibold mb-4 flex items-center">
+                <span className="w-8 h-8 rounded-full bg-violet-600/30 flex items-center justify-center mr-2">
+                  <motion.div animate={{ rotate: 360 }} transition={{ duration: 3, repeat: Infinity, ease: "linear" }}>
+                    <RefreshCw size={14} className="text-violet-400" />
+                  </motion.div>
+                </span>
+                Drawing Controls
+              </h3>
               <div className="flex flex-wrap gap-4 mb-4">
                 <div className="w-full">
-                  <label className="block text-sm text-gray-300 mb-1">Brush: {brushSize}px</label>
+                  <label className=" text-sm text-gray-300 mb-2 flex justify-between">
+                    <span>Brush Size</span>
+                    <span className="bg-violet-900/50 px-2 py-0.5 rounded text-violet-200 text-xs">{brushSize}px</span>
+                  </label>
                   <input 
                     type="range" 
                     min="2" 
                     max="15" 
                     value={brushSize} 
                     onChange={(e) => setBrushSize(parseInt(e.target.value))}
-                    className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-purple-500" 
+                    className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-violet-500" 
                   />
                 </div>
               </div>
               
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <motion.button
                   onClick={clearCanvas}
-                  className="flex items-center justify-center bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded-lg"
-                  whileHover={{ scale: 1.05 }}
+                  className="flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg border border-gray-600/50 shadow-md transition-all"
+                  whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(255, 255, 255, 0.1)" }}
                   whileTap={{ scale: 0.95 }}
                 >
                   <RefreshCw size={16} className="mr-2" />
                   Clear
                 </motion.button>
                 
-                {/* Debug mode toggle */}
+                {/* Debug mode toggle with enhanced styling */}
                 <motion.button
                   onClick={() => setShowDebug(!showDebug)}
-                  className={`flex items-center justify-center py-2 px-4 rounded-lg ${
-                    showDebug ? 'bg-blue-600 hover:bg-blue-500' : 'bg-gray-600 hover:bg-gray-500'
+                  className={`flex items-center justify-center py-2 px-4 rounded-lg border shadow-md transition-all ${
+                    showDebug 
+                      ? 'bg-blue-600 hover:bg-blue-500 border-blue-500/50' 
+                      : 'bg-gray-700 hover:bg-gray-600 border-gray-600/50'
                   } text-white`}
-                  whileHover={{ scale: 1.05 }}
+                  whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(255, 255, 255, 0.1)" }}
                   whileTap={{ scale: 0.95 }}
                 >
                   {showDebug ? 'Debug Mode: ON' : 'Debug Mode: OFF'}
                 </motion.button>
               </div>
-            </div>
+            </motion.div>
             
-            <div className="flex-1 bg-gray-700/50 p-4 rounded-lg">
-              <h3 className="text-white font-medium mb-3">Select Digit</h3>
-              <div className="grid grid-cols-5 gap-2">
+            <motion.div 
+              className="flex-1 bg-gray-800/70 p-5 rounded-xl border border-gray-700/50 shadow-lg"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <h3 className="text-white font-semibold mb-4 flex items-center">
+                <span className="w-8 h-8 rounded-full bg-indigo-600/30 flex items-center justify-center mr-2">
+                  <span className="text-indigo-300 text-xs font-bold">#</span>
+                </span>
+                Select Digit
+              </h3>
+              <div className="grid grid-cols-5 gap-3">
                 {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((digit) => (
                   <motion.button
                     key={digit}
                     onClick={() => handleDigitSelect(digit)}
-                    className={`h-12 rounded-md flex items-center justify-center text-lg font-bold ${
+                    className={`h-14 rounded-lg flex items-center justify-center text-lg font-bold shadow-md border transition-all ${
                       selectedDigit === digit 
-                        ? 'bg-indigo-600 text-white' 
-                        : 'bg-gray-600 text-gray-200 hover:bg-gray-500'
+                        ? 'bg-gradient-to-br from-indigo-600 to-blue-600 text-white border-indigo-500/50' 
+                        : 'bg-gray-700 text-gray-200 hover:bg-gray-600 border-gray-600/50'
                     }`}
-                    whileHover={{ scale: 1.05 }}
+                    whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
                   >
                     {digit}
                   </motion.button>
                 ))}
               </div>
-            </div>
+            </motion.div>
           </div>
           
           <motion.button
             onClick={handleSubmit}
             disabled={selectedDigit === null || isSubmitting}
-            className={`mt-6 w-full flex items-center justify-center py-3 rounded-lg font-medium ${
+            className={`mt-7 w-full flex items-center justify-center py-4 rounded-lg font-medium text-lg shadow-xl transition-all ${
               selectedDigit !== null && !isSubmitting
-                ? 'bg-green-600 hover:bg-green-500 text-white'
-                : 'bg-gray-600 text-gray-300 cursor-not-allowed'
+                ? 'bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 text-white border border-green-500/50'
+                : 'bg-gray-700 text-gray-400 border border-gray-600/50 cursor-not-allowed'
             }`}
-            whileHover={selectedDigit !== null && !isSubmitting ? { scale: 1.02 } : {}}
+            whileHover={selectedDigit !== null && !isSubmitting ? { scale: 1.02, y: -2 } : {}}
             whileTap={selectedDigit !== null && !isSubmitting ? { scale: 0.98 } : {}}
           >
             {isSubmitting ? (
               <>
-                <RefreshCw size={20} className="mr-2 animate-spin" />
+                <RefreshCw size={22} className="mr-3 animate-spin" />
                 Submitting...
               </>
             ) : (
               <>
-                <Save size={20} className="mr-2" />
+                <Save size={22} className="mr-3" />
                 Submit {selectedDigit !== null ? `Digit ${selectedDigit}` : 'Drawing'}
               </>
             )}

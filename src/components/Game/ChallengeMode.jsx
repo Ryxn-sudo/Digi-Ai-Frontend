@@ -1,6 +1,5 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { Award, ArrowRight, Star } from 'lucide-react';
+import { Award, ArrowRight, Star ,X } from 'lucide-react';
 
 const CHALLENGE_TYPES = [
   {

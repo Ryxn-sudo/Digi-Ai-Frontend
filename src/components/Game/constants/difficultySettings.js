@@ -1,6 +1,3 @@
-import React from 'react';
-import { Shield, RotateCw, AlertTriangle, Sparkles } from 'lucide-react';
-
 export const DIFFICULTY_PRESETS = {
   easy: {
     rotationRange: 15,       

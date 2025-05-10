@@ -29,6 +29,7 @@ const Navbar = () => {
   ];
 
   return (
+    
     <motion.nav
       className="bg-gradient-to-r from-gray-900/90 via-gray-800/90 to-gray-900/90 backdrop-blur-lg border-b border-purple-900/50 px-6 py-4 sticky top-0 z-50 shadow-lg shadow-purple-900/10"
       initial={{ y: -20, opacity: 0 }}
@@ -138,7 +139,7 @@ const Navbar = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="md:hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-40"
+              className="lg:hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-40"
               onClick={toggleMenu}
             />
             
@@ -148,7 +149,7 @@ const Navbar = () => {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -300, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="md:hidden fixed left-0 top-0 h-screen w-[280px] bg-gradient-to-b from-gray-900/95 to-gray-800/95 backdrop-blur-md border-r border-purple-900/50 shadow-2xl z-50 overflow-y-auto"
+              className="lg:hidden fixed left-0 top-0 h-screen w-[280px] bg-gradient-to-b from-gray-900/95 to-gray-800/95 backdrop-blur-md border-r border-purple-900/50 shadow-2xl z-50 overflow-y-auto"
             >
               <div className="p-6 pb-4 border-b border-gray-700/70 flex justify-between items-center">
                 <motion.div

@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CanvasDraw from 'react-canvas-draw';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Eraser, Wand2, Settings, Circle, AlertCircle, BarChart, UndoIcon, GridIcon, ZoomIn, ZoomOut, RotateCcw, Download } from 'lucide-react';
+import { Eraser, Wand2, Settings, Circle, AlertCircle, BarChart, UndoIcon, GridIcon, Download } from 'lucide-react';
 
 const DrawingCanvas = ({ 
   canvasRef, 
   brushSize, 
   setBrushSize, 
-  canvasSize, 
+  canvasSize: initialCanvasSize,
+  setCanvasSize,
   showDebug, 
   setShowDebug, 
   clearCanvas, 
@@ -15,8 +16,37 @@ const DrawingCanvas = ({
   loading 
 }) => {
   const [showGrid, setShowGrid] = useState(false);
-  const [zoom, setZoom] = useState(1);
   const [showTools, setShowTools] = useState(false);
+  const [canvasSize, setLocalCanvasSize] = useState(initialCanvasSize);
+  const [containerWidth, setContainerWidth] = useState('100%');
+
+  // Add resize handler to make canvas responsive
+  useEffect(() => {
+    const handleResize = () => {
+      const screenWidth = window.innerWidth;
+      
+      if (screenWidth < 768) { // Mobile devices
+        const newSize = Math.min(screenWidth - 32, 400); // Account for padding
+        setLocalCanvasSize({
+          width: newSize,
+          height: newSize
+        });
+        setContainerWidth(`${newSize + 8}px`);
+      } else {
+        setLocalCanvasSize(initialCanvasSize);
+        setContainerWidth(`${initialCanvasSize.width + 8}px`);
+      }
+    };
+    
+    // Call once on mount
+    handleResize();
+    
+    // Add event listener for window resize
+    window.addEventListener('resize', handleResize);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', handleResize);
+  }, [initialCanvasSize]);
 
   const handleUndo = () => {
     if (canvasRef.current) {
@@ -36,7 +66,7 @@ const DrawingCanvas = ({
 
   return (
     <motion.div 
-      className="space-y-6"
+      className="space-y-6 max-w-full px-2"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
@@ -44,8 +74,9 @@ const DrawingCanvas = ({
       <motion.div 
         className={`bg-white rounded-xl p-1 mx-auto shadow-2xl relative overflow-hidden ${showGrid ? 'bg-grid' : ''}`}
         style={{ 
-          width: canvasSize.width + 8, 
-          transform: `scale(${zoom})`,
+          width: containerWidth, 
+          maxWidth: '100%',
+          transform: `scale(1)`,
           transformOrigin: 'center top'
         }}
         whileHover={{ boxShadow: "0 0 20px rgba(168, 85, 247, 0.4)" }}
